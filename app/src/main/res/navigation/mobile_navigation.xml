@@ -10,11 +10,11 @@
         android:name="com.example.finalproject1.ui.home.HomeFragment"
         android:label="Home" />
     <fragment
-        android:id="@+id/navigation_dashboard"
+        android:id="@+id/navigation_analytics"
         android:name="com.example.finalproject1.ui.dashboard.AnalyticsFragment"
         android:label="Analytics" />
     <fragment
-        android:id="@+id/navigation_notifications"
+        android:id="@+id/navigation_profile"
         android:name="com.example.finalproject1.ui.notifications.ProfileFragment"
         android:label="Profile" />
 </navigation>
