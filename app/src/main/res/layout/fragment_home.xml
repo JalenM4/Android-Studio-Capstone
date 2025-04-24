@@ -6,17 +6,39 @@
     android:layout_height="match_parent"
     tools:context=".ui.home.HomeFragment">
 
+    <!-- Display remaining budget -->
     <TextView
-        android:id="@+id/text_home"
-        android:layout_width="match_parent"
+        android:id="@+id/textViewBudget"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
+        android:text="Remaining Budget: $0.00"
         android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:paddingBottom="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Expense list -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewExpenses"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/textViewBudget"
+        app:layout_constraintBottom_toTopOf="@+id/buttonAddExpense"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:listitem="@layout/item_expense" />
+
+    <!-- Add expense button -->
+    <Button
+        android:id="@+id/buttonAddExpense"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Add Expense"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewBudget" />
 </androidx.constraintlayout.widget.ConstraintLayout>
