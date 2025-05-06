@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.finalproject1.databinding.FragmentHomeBinding
+import com.example.finalproject1.ui.notifications.ProfileViewModel
 
 data class Expense(val name: String, val amount: Double, val category: String)
 
@@ -18,7 +19,7 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
-    private val homeViewModel: HomeViewModel by activityViewModels()
+    private val profileViewModel: ProfileViewModel by activityViewModels()
 
     private val expenseList = mutableListOf<Expense>()
     private lateinit var adapter: ExpenseAdapter
@@ -45,23 +46,27 @@ class HomeFragment : Fragment() {
         binding.recyclerViewExpenses.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerViewExpenses.adapter = adapter
 
-        // Observe LiveData
-        homeViewModel.monthlyBudget.observe(viewLifecycleOwner) { budget ->
-            binding.textViewBudget.text = "Monthly Budget: $%.2f".format(budget)
+        // Observe LiveData from ProfileViewModel
+        profileViewModel.monthlyBudget.observe(viewLifecycleOwner) { budget ->
+            updateRemainingBudget()
         }
 
-        homeViewModel.totalExpenses.observe(viewLifecycleOwner) { expenses ->
+        profileViewModel.totalExpenses.observe(viewLifecycleOwner) { expenses ->
             binding.textViewExpenses.text = "Total Expenses: $%.2f".format(expenses)
-        }
-
-        homeViewModel.remainingBudget.observe(viewLifecycleOwner) { remaining ->
-            binding.textViewBudget.text = "Remaining Budget: $%.2f".format(remaining)
+            updateRemainingBudget()
         }
 
         // Add Expense Button
         binding.buttonAddExpense.setOnClickListener {
             addExpense()
         }
+    }
+
+    private fun updateRemainingBudget() {
+        val budget = profileViewModel.monthlyBudget.value ?: 0.0
+        val expenses = profileViewModel.totalExpenses.value ?: 0.0
+        val remaining = budget - expenses
+        binding.textViewBudget.text = "Remaining Budget: $%.2f".format(remaining)
     }
 
     private fun addExpense() {
@@ -85,8 +90,9 @@ class HomeFragment : Fragment() {
         expenseList.add(expense)
         adapter.notifyItemInserted(expenseList.size - 1)
 
-        // Update ViewModel budget
-        homeViewModel.addExpense(amount, category)
+        // Update total expenses in ViewModel
+        val currentExpenses = profileViewModel.totalExpenses.value ?: 0.0
+        profileViewModel.setTotalExpenses(currentExpenses + amount)
 
         // Clear inputs
         binding.editTextExpenseName.text.clear()

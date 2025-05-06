@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -19,27 +20,35 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Monthly Budget Info -->
     <TextView
-        android:id="@+id/textViewMonthlyBudget"
-        android:layout_width="wrap_content"
+        android:id="@+id/textViewAccount"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Monthly Budget: $0.00"
-        android:textSize="18sp"
-        android:layout_marginTop="24dp"
-        app:layout_constraintTop_toBottomOf="@id/textViewProfileTitle"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="16dp"
+        android:text="Account"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/textViewProfileTitle" />
 
-    <!-- Total Expenses Info -->
+    <!-- Settings Option -->
     <TextView
-        android:id="@+id/textViewTotalExpenses"
-        android:layout_width="wrap_content"
+        android:id="@+id/textViewSettings"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Total Expenses: $0.00"
-        android:textSize="18sp"
+        android:text="Settings"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:padding="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
         android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/textViewMonthlyBudget"
+        app:layout_constraintTop_toBottomOf="@id/textViewAccount"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
