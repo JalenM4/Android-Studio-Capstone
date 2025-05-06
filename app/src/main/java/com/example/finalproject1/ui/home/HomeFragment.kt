@@ -4,33 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.finalproject1.databinding.FragmentHomeBinding
 
-data class Expense(val name: String, val amount: Double)
-
-class ExpenseAdapter(private val expenseList: List<Expense>) :
-    androidx.recyclerview.widget.RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHolder>() {
-
-    class ExpenseViewHolder(val binding: com.example.finalproject1.databinding.ItemExpenseBinding) :
-        androidx.recyclerview.widget.RecyclerView.ViewHolder(binding.root)
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExpenseViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        val binding = com.example.finalproject1.databinding.ItemExpenseBinding.inflate(inflater, parent, false)
-        return ExpenseViewHolder(binding)
-    }
-
-    override fun onBindViewHolder(holder: ExpenseViewHolder, position: Int) {
-        val expense = expenseList[position]
-        holder.binding.textViewExpenseTitle.text = expense.name
-        holder.binding.textViewExpenseAmount.text = "$%.2f".format(expense.amount)
-    }
-
-    override fun getItemCount(): Int = expenseList.size
-}
+data class Expense(val name: String, val amount: Double, val category: String)
 
 class HomeFragment : Fragment() {
 
@@ -53,11 +34,18 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Setup RecyclerView
-        adapter = ExpenseAdapter(expenseList)
-        binding.recyclerViewExpenseList.layoutManager = LinearLayoutManager(requireContext())
-        binding.recyclerViewExpenseList.adapter = adapter
+        // Set up categories in spinner
+        val categories = listOf("Food", "Shopping", "Transport", "Entertainment", "Others")
+        val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categories)
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerCategory.adapter = spinnerAdapter
 
+        // Set up RecyclerView
+        adapter = ExpenseAdapter(expenseList)
+        binding.recyclerViewExpenses.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerViewExpenses.adapter = adapter
+
+        // Observe LiveData
         homeViewModel.monthlyBudget.observe(viewLifecycleOwner) { budget ->
             binding.textViewBudget.text = "Monthly Budget: $%.2f".format(budget)
         }
@@ -70,29 +58,39 @@ class HomeFragment : Fragment() {
             binding.textViewBudget.text = "Remaining Budget: $%.2f".format(remaining)
         }
 
+        // Add Expense Button
         binding.buttonAddExpense.setOnClickListener {
-            val name = binding.editTextExpenseName.text.toString()
-            val amountText = binding.editTextExpenseAmount.text.toString()
-
-            if (name.isNotBlank() && amountText.isNotBlank()) {
-                val amount = amountText.toDoubleOrNull()
-                if (amount != null && amount > 0) {
-                    homeViewModel.addExpense(amount)
-
-                    // Add to list and refresh RecyclerView
-                    expenseList.add(Expense(name, amount))
-                    adapter.notifyItemInserted(expenseList.size - 1)
-
-                    // Clear input fields
-                    binding.editTextExpenseName.text.clear()
-                    binding.editTextExpenseAmount.text.clear()
-                } else {
-                    // Optional: Show error for invalid amount
-                }
-            } else {
-                // Optional: Show error for empty fields
-            }
+            addExpense()
         }
+    }
+
+    private fun addExpense() {
+        val name = binding.editTextExpenseName.text.toString()
+        val amountText = binding.editTextExpenseAmount.text.toString()
+        val category = binding.spinnerCategory.selectedItem.toString()
+
+        if (name.isBlank() || amountText.isBlank()) {
+            Toast.makeText(requireContext(), "Please enter name and amount", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val amount = amountText.toDoubleOrNull()
+        if (amount == null || amount <= 0) {
+            Toast.makeText(requireContext(), "Enter a valid amount", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Add expense to list
+        val expense = Expense(name, amount, category)
+        expenseList.add(expense)
+        adapter.notifyItemInserted(expenseList.size - 1)
+
+        // Update ViewModel budget
+        homeViewModel.addExpense(amount, category)
+
+        // Clear inputs
+        binding.editTextExpenseName.text.clear()
+        binding.editTextExpenseAmount.text.clear()
     }
 
     override fun onDestroyView() {

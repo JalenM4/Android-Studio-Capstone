@@ -12,6 +12,10 @@ class HomeViewModel : ViewModel() {
     private val _totalExpenses = MutableLiveData<Double>()
     val totalExpenses: LiveData<Double> get() = _totalExpenses
 
+    // NEW: map of categories ➔ amount spent
+    private val _categoryExpenses = MutableLiveData<MutableMap<String, Double>>()
+    val categoryExpenses: LiveData<MutableMap<String, Double>> get() = _categoryExpenses
+
     val remainingBudget: LiveData<Double> = object : MutableLiveData<Double>() {
         init {
             _monthlyBudget.observeForever {
@@ -26,10 +30,19 @@ class HomeViewModel : ViewModel() {
     init {
         _monthlyBudget.value = 1000.00
         _totalExpenses.value = 200.00
+
+        // Initialize category expenses with empty map
+        _categoryExpenses.value = mutableMapOf()
     }
 
-    fun addExpense(amount: Double) {
+    // Now expenses are added with category
+    fun addExpense(amount: Double, category: String) {
         _totalExpenses.value = (_totalExpenses.value ?: 0.0) + amount
+
+        val currentMap = _categoryExpenses.value ?: mutableMapOf()
+        val existingAmount = currentMap[category] ?: 0.0
+        currentMap[category] = existingAmount + amount
+        _categoryExpenses.value = currentMap
     }
 
     fun setMonthlyBudget(budget: Double) {
@@ -38,5 +51,6 @@ class HomeViewModel : ViewModel() {
 
     fun resetExpenses() {
         _totalExpenses.value = 0.0
+        _categoryExpenses.value = mutableMapOf()
     }
 }
